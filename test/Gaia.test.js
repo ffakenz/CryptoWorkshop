@@ -13,28 +13,70 @@ contract("Gaia Test", function (accounts) {
         this.gaiaStore = await GaiaStore.new(nfticket.address, [recipient, other]);
     });
 
-    it("e2e", async () => {
-        // create ticket
+    it("create nft ticket", async () => {
         const ticketId = 1;
         await this.nfticket.createTicket(ticketId, this.gaiaStore.address, { from: deployer });
 
         // check gaia has nft ticket balance
-        expect(await this.nfticket.balanceOf(this.gaiaStore.address)).to.be.bignumber.equal('1');
+        const gaiaStoreNFTBalance = await this.nfticket.balanceOf(this.gaiaStore.address);
+        expect(gaiaStoreNFTBalance).to.be.bignumber.equal('1');
+    });
 
-        // create event
+    it("create event", async () => {
+        const ticketId = 1;
         const eventId = 1;
-        await this.gaiaStore.createEvent(eventId, 311012, 2, [ticketId]);
+        
+        await this.nfticket.createTicket(ticketId, this.gaiaStore.address, { from: deployer });
+        await this.gaiaStore.createEvent(eventId, 311221, 2, [ticketId]);
 
-        // reject unknown buyer
-        await expect(this.gaiaStore.buyTicket(eventId, { from: unknown, value: "2", gasPrice: 0 }))
-            .to.eventually.be.rejected;
+        // check event exists
+        const created = await this.gaiaStore.getEvent(eventId);
+        expect(created.status).to.be.bignumber.equal('1');
+    });
+
+    it("reject unknown buyer", async () => {
+        const ticketId = 1;
+        const eventId = 1;
+
+        await this.nfticket.createTicket(ticketId, this.gaiaStore.address, { from: deployer });
+        await this.gaiaStore.createEvent(eventId, 311221, 2, [ticketId]);
+
+        // reject buy due to unknown buyer
+        const maybeTicket = await this.gaiaStore.buyTicket(eventId, { from: unknown, value: "2", gasPrice: 0 });
+        await expect(maybeTicket).to.eventually.be.rejected;
+    });
+
+    it("reject buy due to insufficient funds", async () => {
+        const ticketId = 1;
+        const eventId = 1;
+
+        await this.nfticket.createTicket(ticketId, this.gaiaStore.address, { from: deployer });
+        await this.gaiaStore.createEvent(eventId, 311221, 2, [ticketId]);
+
+        // reject buy due to insufficient funds
+        const maybeTicket = await this.gaiaStore.buyTicket(eventId, { from: recipient, value: "1", gasPrice: 0 });
+        await expect(maybeTicket).to.eventually.be.rejected;
+    });
+
+    it("reject buy due to not enough tickets", async () => {
+        const eventId = 1;
+
+        await this.gaiaStore.createEvent(eventId, 311221, 2, []);
+
+        // reject buy due to not enough tickets
+        const maybeTicket = await this.gaiaStore.buyTicket(eventId, { from: recipient, value: "2", gasPrice: 0 });
+        await expect(maybeTicket).to.eventually.be.rejected;
+    });
+
+    it("sell ticket to whitelisted customer", async () => {
+        const ticketId = 1;
+        const eventId = 1;
+
+        await this.nfticket.createTicket(ticketId, this.gaiaStore.address, { from: deployer });
+        await this.gaiaStore.createEvent(eventId, 311221, 2, [ticketId]);
 
         // check gaia has balance 0
         expect(await web3.eth.getBalance(this.gaiaStore.address)).to.be.bignumber.equal('0');
-
-        // reject buy due to insufficient funds
-        await expect(this.gaiaStore.buyTicket(eventId, { from: unknown, value: "1", gasPrice: 0 }))
-            .to.eventually.be.rejected;
 
         // sell ticket to whitelisted customer
         await this.gaiaStore.buyTicket(eventId, { from: recipient, value: "2", gasPrice: 0 });
@@ -44,9 +86,5 @@ contract("Gaia Test", function (accounts) {
         
         // check gaia has balance 2
         expect(await web3.eth.getBalance(this.gaiaStore.address)).to.be.bignumber.equal('2');
-
-        // reject buy due to not enough tickets
-        await expect(this.gaiaStore.buyTicket(eventId, { from: recipient, value: "2", gasPrice: 0 }))
-            .to.eventually.be.rejected;
     });
 });

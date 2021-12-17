@@ -51,22 +51,34 @@ contract GaiaStore is Ownable, Pausable {
         uint256 _ticketPrice,
         uint256[] calldata _tickets
     ) external whenNotPaused {
+        for(uint i = 0; i < _tickets.length; i += 1) {
+            uint256 _ticketId = _tickets[i];
+            bool gaiaStoreIsOwner = store.nfticket.ownerOf(_ticketId) == address(this);
+            if(!gaiaStoreIsOwner) {
+                string memory errorMsg = string(abi.encodePacked(
+                    "nfticket ",
+                    _ticketId.toString(),
+                    " not owned by gaiastore"
+                ));
+                revert(errorMsg);
+            }
+            store.eventTickets[_eventId].push(_ticketId);
+        }
         store.events[_eventId] = Event({
             eventId: _eventId,
             startDate: _startDate,
             ticketPrice: _ticketPrice,
             status: EventStatus.Created
         });
-        for(uint i = 0; i < _tickets.length; i += 1) {
-            uint256 _ticketId = _tickets[i];
-            store.eventTickets[_eventId].push(_ticketId);
-        }
     }
 
     /**
      * @dev payables
      */
     function buyTicket(uint256 _eventId) external payable onlyWhitelisted whenNotPaused {
+        //@TODO
+        require(store.events[_eventId].status == EventStatus.Created, "event does not exists");
+
         uint256 _ticketsAmount = store.eventTickets[_eventId].length;
         require(_ticketsAmount > 0, "not enough tickets");
         
@@ -78,5 +90,9 @@ contract GaiaStore is Ownable, Pausable {
 
         store.nfticket.transferFrom(address(this), msg.sender, _ticketId);
         store.eventTickets[_eventId].pop();
+    }
+
+    function getEvent(uint256 _eventId) external view returns(Event memory) {
+        return store.events[_eventId];
     }
 }
