@@ -18,7 +18,7 @@ contract NFTicket is ERC721, Pausable, Ownable {
     /**
      * @dev externals
      */
-    function createTicket(uint256 tokenId, address to) external onlyOwner {
-        _mint(to, tokenId);
+    function createTicket(uint256 _tokenId, address _to) external onlyOwner {
+        _mint(_to, _tokenId);
     }
 }

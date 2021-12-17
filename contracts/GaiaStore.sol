@@ -50,7 +50,7 @@ contract GaiaStore is Ownable, Pausable {
         uint256 _startDate,
         uint256 _ticketPrice,
         uint256[] calldata _tickets
-    ) external whenNotPaused {
+    ) external onlyOwner whenNotPaused {
         for(uint i = 0; i < _tickets.length; i += 1) {
             uint256 _ticketId = _tickets[i];
             bool gaiaStoreIsOwner = store.nfticket.ownerOf(_ticketId) == address(this);
@@ -76,8 +76,7 @@ contract GaiaStore is Ownable, Pausable {
      * @dev payables
      */
     function buyTicket(uint256 _eventId) external payable onlyWhitelisted whenNotPaused {
-        //@TODO
-        require(store.events[_eventId].status == EventStatus.Created, "event does not exists");
+        require(store.events[_eventId].status != EventStatus.Void, "event does not exists");
 
         uint256 _ticketsAmount = store.eventTickets[_eventId].length;
         require(_ticketsAmount > 0, "not enough tickets");
