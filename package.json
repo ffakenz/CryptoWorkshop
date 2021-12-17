@@ -1,0 +1,36 @@
+{
+  "name": "cryptoworkshop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test",
+    "prettier": "prettier  --write '**/*.{js,sol}'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LemosTestagrossa/CryptoWorkshop.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LemosTestagrossa/CryptoWorkshop/issues"
+  },
+  "homepage": "https://github.com/LemosTestagrossa/CryptoWorkshop#readme",
+  "devDependencies": {
+    "@openzeppelin/contracts": "^4.4.0",
+    "prettier": "^2.5.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.19"
+  },
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^2.0.0",
+    "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
+    "chai-bn": "^0.3.0",
+    "web3": "^1.6.1",
+    "web3-eth-accounts": "^1.6.1"
+  }
+}
