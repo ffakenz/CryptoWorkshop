@@ -6,14 +6,12 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 contract NFTicket is ERC721, Pausable, Ownable {
-
     /**
      * @dev constructor
      */
-    constructor(
-        string memory _eventName,
-        string memory _eventSymbol
-    ) ERC721(_eventName, _eventSymbol) {}
+    constructor(string memory _eventName, string memory _eventSymbol)
+        ERC721(_eventName, _eventSymbol)
+    {}
 
     /**
      * @dev externals
