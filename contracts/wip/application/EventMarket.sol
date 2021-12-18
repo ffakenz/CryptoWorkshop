@@ -3,9 +3,9 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "../interfaces/IEventContract.sol";
-import "../interfaces/INFTContract.sol";
-import "../interfaces/IEventStoreAbstractFactory.sol";
+import "../domain/interfaces/IEventContract.sol";
+import "../domain/interfaces/INFTContract.sol";
+import "../domain/interfaces/IEventStoreAbstractFactory.sol";
 import "../infrastructure/EventStoreFactoryImpl.sol";
 
 contract EventMarket is Ownable {

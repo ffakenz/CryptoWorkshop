@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "../../interfaces/IEventContract.sol";
+import "../interfaces/IEventContract.sol";
 
 contract EventContractImpl is IEventContract, Ownable {
     /**
