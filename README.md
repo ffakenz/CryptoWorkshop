@@ -13,20 +13,27 @@ https://marketplace.visualstudio.com/items?itemName=JuanBlanco.solidity
 3. Install Truffle 
 `npm install truffle -g`
 
+4. Install Ganache
+`npm install ganache-cli -g`
+
 ## How to setup
 
 #### Install npm packages
 Install all dependencies
 `npm install`
 
-## How to test in your computer
-
-#### Setup Ganache
+## How to run local test
 1. Run local env
 `truffle develop`
 
 2. Run tests 
 `truffle test`
+
+## How to run local deployment
+1. Run local blockchain
+`ganache-cli`
+2. Run local deployment
+`truffle deploy --network development`
 
 ## How to run on the testnet
 

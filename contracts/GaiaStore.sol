@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./model/IStoreEvents.sol";
+import "./model/IStore.sol";
 import "./model/StoreModel.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-contract GaiaStore is IStoreEvents, Ownable, Pausable {
+contract GaiaStore is IStore, Ownable, Pausable {
     using SafeMath for uint256;
     using Strings for uint256;
 
@@ -16,7 +16,7 @@ contract GaiaStore is IStoreEvents, Ownable, Pausable {
      * @dev contract state
      */
     StoreState store;
-
+    
     /**
      * @dev constructor
      */
