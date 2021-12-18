@@ -6,32 +6,28 @@ import "../interfaces/IEventContract.sol";
 import "../interfaces/INFTContract.sol";
 import "../interfaces/IEventStoreAbstractFactory.sol";
 import "../interfaces/IEventStoreAbstractFactory.sol";
-import "../application/EventMarket.sol";
+import "../domain/event/EventContractImpl.sol";
+import "../domain/nft/NFTicketImpl.sol";
 
 contract EventStoreFactoryImpl is IEventStoreAbstractFactory, Ownable {
-    address[] public eventContracts;
-    address[] public nftContracts;
-
     function createEventContract(
         uint256 _eventId,
         uint256 _startDate,
         uint256 _ticketPrice
-    ) external onlyOwner returns (address) {
+    ) external onlyOwner returns (IEventContract) {
         IEventContract eventContract = new EventContractImpl(
             _eventId,
             _startDate,
             _ticketPrice
         );
-        nftContracts.push(address(eventContract));
-        return address(this);
+        return eventContract;
     }
 
     function createNFTContract(
         string memory _eventName,
         string memory _eventSymbol
-    ) external onlyOwner returns (address) {
+    ) external onlyOwner returns (INFTContract) {
         INFTContract nftContract = new NFTicketImpl(_eventName, _eventSymbol);
-        nftContracts.push(address(nftContract));
-        return address(this);
+        return nftContract;
     }
 }
