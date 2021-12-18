@@ -14,9 +14,6 @@
 4. Install Truffle
    `npm install truffle -g`
 
-5. Install Ganache
-   `npm install ganache-cli -g`
-
 ## How to setup
 
 #### Install npm packages
@@ -25,21 +22,16 @@
 
 2. `npm run setup-git-hooks`
 
-## How to run local test
+## How to run local
 
 1. Run local env
    `truffle develop`
 
-2. Run tests
-   `truffle test`
+2. Run local tests
+   `truffle(develop)> test`
 
-## How to run local deployment
-
-1. Run local blockchain
-   `ganache-cli`
-
-2. Run local deployment
-   `truffle deploy --network development`
+3. Run local deployment
+   `truffle(develop)> deploy`
 
 ## How to run on the testnet
 
