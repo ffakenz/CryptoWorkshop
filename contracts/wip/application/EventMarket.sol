@@ -39,12 +39,32 @@ contract EventContractImpl is IEventContract, Ownable {
     function buyTicket(uint256 _eventId) external payable onlyOwner {}
 }
 
-contract EventMarket {
+contract EventMarket is Ownable {
     IEventContract eventContract;
     INFTContract nftContract;
+    IEventStoreAbstractFactory factory;
 
-    constructor(address _eventContract, address _nftContract) {
-        eventContract = IEventContract(_eventContract);
+    constructor(address _factory) {
+        factory = IEventStoreAbstractFactory(_factory);
+    }
+
+    function createEvent(
+        uint256 _eventId,
+        uint256 _startDate,
+        uint256 _ticketPrice,
+        string memory _eventName,
+        string memory _eventSymbol
+    ) external onlyOwner {
+        address _nftContract = factory.createNFTContract(
+            _eventName,
+            _eventSymbol
+        );
         nftContract = INFTContract(_nftContract);
+        address _eventContract = factory.createEventContract(
+            _eventId,
+            _startDate,
+            _ticketPrice
+        );
+        eventContract = IEventContract(_eventContract);
     }
 }
