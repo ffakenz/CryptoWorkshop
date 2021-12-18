@@ -9,7 +9,7 @@
   "scripts": {
     "test": "truffle test",
     "prettier": "prettier  --write '**/*.{js,sol}'",
-    "prestart": "cp scripts/pre-commit .git/hooks/ && chmod +x .git/hooks/pre-commit && echo 'hook copied'"
+    "setup-git-hooks": "cp scripts/pre-commit .git/hooks/ && cp scripts/post-commit .git/hooks/ && chmod +x .git/hooks/pre-commit && chmod +x .git/hooks/post-commit && echo 'hook copied'"
   },
   "repository": {
     "type": "git",
