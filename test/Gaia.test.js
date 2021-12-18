@@ -44,21 +44,36 @@ contract("Gaia Test", function (accounts) {
 
     it("reject to create event if not owner", async () => {
         const eventId = 1;
+        const ticketPrice = 2;
+
         await truffleAssert.reverts(
-            this.gaiaStore.createEvent(eventId, 311221, 2, [], {from: other}),
+            this.gaiaStore.createEvent(eventId, 311221, ticketPrice, [], {from: other}),
             CALLER_IS_NOT_THE_OWNER
         );
     });
 
     it("create event", async () => {
-        const ticketId = 1;
+        const ticketId1 = 1;
+        const ticketId2 = 2;
         const eventId = 1;
+        const ticketPrice = 2;
+        const eventStartDate = 311221;
 
-        await this.nfticket.createTicket(ticketId, this.gaiaStore.address, {
+        await this.nfticket.createTicket(ticketId1, this.gaiaStore.address, {
             from: deployer,
         });
-        await this.gaiaStore.createEvent(eventId, 311221, 2, [ticketId], {
+        await this.nfticket.createTicket(ticketId2, this.gaiaStore.address, {
             from: deployer,
+        });
+        const eventCreated = await this.gaiaStore.createEvent(
+            eventId, 311221, ticketPrice, [ticketId1, ticketId2], {from: deployer }
+        );
+        truffleAssert.eventEmitted(eventCreated, 'EventCreated', (ev) => {
+            return ev._eventId == eventId &&
+            ev._startDate == eventStartDate &&
+            ev._ticketPrice == ticketPrice &&
+            ev._status == 1 &&
+            ev._tickets == `${ticketId1},${ticketId2}`;
         });
 
         // check event exists
@@ -80,8 +95,9 @@ contract("Gaia Test", function (accounts) {
 
     it("reject buy due to not enough tickets", async () => {
         const eventId = 1;
+        const ticketPrice = 2;
 
-        await this.gaiaStore.createEvent(eventId, 311221, 2, [], {
+        await this.gaiaStore.createEvent(eventId, 311221, ticketPrice, [], {
             from: deployer,
         });
 
@@ -89,7 +105,7 @@ contract("Gaia Test", function (accounts) {
         await truffleAssert.reverts(
             this.gaiaStore.buyTicket(eventId, {
                 from: recipient,
-                value: "2",
+                value: ticketPrice,
                 gasPrice: 0,
             }),
             NOT_ENOUGH_TICKETS
@@ -99,11 +115,12 @@ contract("Gaia Test", function (accounts) {
     it("reject unknown buyer", async () => {
         const ticketId = 1;
         const eventId = 1;
+        const ticketPrice = 2;
 
         await this.nfticket.createTicket(ticketId, this.gaiaStore.address, {
             from: deployer,
         });
-        await this.gaiaStore.createEvent(eventId, 311221, 2, [ticketId], {
+        await this.gaiaStore.createEvent(eventId, 311221, ticketPrice, [ticketId], {
             from: deployer,
         });
 
@@ -111,7 +128,7 @@ contract("Gaia Test", function (accounts) {
         await truffleAssert.reverts(
             this.gaiaStore.buyTicket(eventId, {
                 from: unknown,
-                value: "2",
+                value: ticketPrice,
                 gasPrice: 0,
             }),
             USER_NOT_ALLOWED
@@ -121,11 +138,12 @@ contract("Gaia Test", function (accounts) {
     it("reject buy due to insufficient funds", async () => {
         const ticketId = 1;
         const eventId = 1;
+        const ticketPrice = 2;
 
         await this.nfticket.createTicket(ticketId, this.gaiaStore.address, {
             from: deployer,
         });
-        await this.gaiaStore.createEvent(eventId, 311221, 2, [ticketId], {
+        await this.gaiaStore.createEvent(eventId, 311221, ticketPrice, [ticketId], {
             from: deployer,
         });
 
@@ -143,11 +161,12 @@ contract("Gaia Test", function (accounts) {
     it("sell ticket to whitelisted customer", async () => {
         const ticketId = 1;
         const eventId = 1;
+        const ticketPrice = 2;
 
         await this.nfticket.createTicket(ticketId, this.gaiaStore.address, {
             from: deployer,
         });
-        await this.gaiaStore.createEvent(eventId, 311221, 2, [ticketId], {
+        await this.gaiaStore.createEvent(eventId, 311221, ticketPrice, [ticketId], {
             from: deployer,
         });
 
@@ -155,16 +174,22 @@ contract("Gaia Test", function (accounts) {
         assert.equal(await web3.eth.getBalance(this.gaiaStore.address), 0);
 
         // sell ticket to whitelisted customer
-        await this.gaiaStore.buyTicket(eventId, {
+        const ticketSold = await this.gaiaStore.buyTicket(eventId, {
             from: recipient,
-            value: "2",
+            value: ticketPrice,
             gasPrice: 0,
+        });
+        truffleAssert.eventEmitted(ticketSold, 'TicketSold', (ev) => {
+            return ev._ticketId == ticketId &&
+            ev._eventId == eventId &&
+            ev._customer == recipient &&
+            ev._price == ticketPrice;
         });
 
         // check customer has nft balance
         assert.equal(await this.nfticket.balanceOf(recipient), 1);
 
         // check gaia has balance 2
-        assert.equal(await web3.eth.getBalance(this.gaiaStore.address), 2);
+        assert.equal(await web3.eth.getBalance(this.gaiaStore.address), ticketPrice);
     });
 });

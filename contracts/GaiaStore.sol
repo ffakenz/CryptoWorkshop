@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./Model.sol";
+import "./model/IStoreEvents.sol";
+import "./model/StoreModel.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-contract GaiaStore is Ownable, Pausable {
+contract GaiaStore is IStoreEvents, Ownable, Pausable {
     using SafeMath for uint256;
     using Strings for uint256;
 
@@ -67,11 +68,21 @@ contract GaiaStore is Ownable, Pausable {
             }
             store.eventTickets[_eventId].push(_ticketId);
         }
+        
+        EventStatus _status = EventStatus.Created;
         store.events[_eventId] = Event({
             eventId: _eventId,
             startDate: _startDate,
             ticketPrice: _ticketPrice,
-            status: EventStatus.Created
+            status: _status
+        });
+        
+        emit EventCreated({
+            _eventId: _eventId,
+            _startDate: _startDate,
+            _ticketPrice: _ticketPrice,
+            _status: _status,
+            _tickets: _tickets
         });
     }
 
@@ -100,8 +111,19 @@ contract GaiaStore is Ownable, Pausable {
 
         store.nfticket.transferFrom(address(this), msg.sender, _ticketId);
         store.eventTickets[_eventId].pop();
+
+        emit TicketSold({
+            _ticketId: _ticketId,
+            _eventId: _eventId,
+            _customer: msg.sender,
+            _date: block.timestamp,
+            _price: _ticketPrice
+        });
     }
 
+    /**
+     * @dev views
+     */
     function getEvent(uint256 _eventId) external view returns (Event memory) {
         return store.events[_eventId];
     }
