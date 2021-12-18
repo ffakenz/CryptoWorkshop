@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "truffle test",
-    "prettier": "prettier  --write '**/*.{js,sol}'"
+    "prettier": "prettier  --write '**/*.{js,sol}'",
+    "prestart": "cp scripts/pre-commit .git/hooks/ && chmod +x .git/hooks/pre-commit && echo 'hook copied'"
   },
   "repository": {
     "type": "git",

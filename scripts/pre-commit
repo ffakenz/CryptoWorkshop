@@ -1,0 +1,13 @@
+#!/bin/sh
+
+echo "*****Running formatter******"
+
+git stash -q --keep-index
+
+npm run prettier
+
+status=$?
+
+git stash pop -q
+
+exit $status

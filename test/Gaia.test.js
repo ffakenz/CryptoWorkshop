@@ -47,7 +47,9 @@ contract("Gaia Test", function (accounts) {
         const ticketPrice = 2;
 
         await truffleAssert.reverts(
-            this.gaiaStore.createEvent(eventId, 311221, ticketPrice, [], {from: other}),
+            this.gaiaStore.createEvent(eventId, 311221, ticketPrice, [], {
+                from: other,
+            }),
             CALLER_IS_NOT_THE_OWNER
         );
     });
@@ -66,14 +68,20 @@ contract("Gaia Test", function (accounts) {
             from: deployer,
         });
         const eventCreated = await this.gaiaStore.createEvent(
-            eventId, 311221, ticketPrice, [ticketId1, ticketId2], {from: deployer }
+            eventId,
+            311221,
+            ticketPrice,
+            [ticketId1, ticketId2],
+            {from: deployer}
         );
-        truffleAssert.eventEmitted(eventCreated, 'EventCreated', (ev) => {
-            return ev._eventId == eventId &&
-            ev._startDate == eventStartDate &&
-            ev._ticketPrice == ticketPrice &&
-            ev._status == 1 &&
-            ev._tickets == `${ticketId1},${ticketId2}`;
+        truffleAssert.eventEmitted(eventCreated, "EventCreated", (ev) => {
+            return (
+                ev._eventId == eventId &&
+                ev._startDate == eventStartDate &&
+                ev._ticketPrice == ticketPrice &&
+                ev._status == 1 &&
+                ev._tickets == `${ticketId1},${ticketId2}`
+            );
         });
 
         // check event exists
@@ -120,9 +128,15 @@ contract("Gaia Test", function (accounts) {
         await this.nfticket.createTicket(ticketId, this.gaiaStore.address, {
             from: deployer,
         });
-        await this.gaiaStore.createEvent(eventId, 311221, ticketPrice, [ticketId], {
-            from: deployer,
-        });
+        await this.gaiaStore.createEvent(
+            eventId,
+            311221,
+            ticketPrice,
+            [ticketId],
+            {
+                from: deployer,
+            }
+        );
 
         // reject buy due to unknown buyer
         await truffleAssert.reverts(
@@ -143,9 +157,15 @@ contract("Gaia Test", function (accounts) {
         await this.nfticket.createTicket(ticketId, this.gaiaStore.address, {
             from: deployer,
         });
-        await this.gaiaStore.createEvent(eventId, 311221, ticketPrice, [ticketId], {
-            from: deployer,
-        });
+        await this.gaiaStore.createEvent(
+            eventId,
+            311221,
+            ticketPrice,
+            [ticketId],
+            {
+                from: deployer,
+            }
+        );
 
         // reject buy due to insufficient funds
         await truffleAssert.reverts(
@@ -166,9 +186,15 @@ contract("Gaia Test", function (accounts) {
         await this.nfticket.createTicket(ticketId, this.gaiaStore.address, {
             from: deployer,
         });
-        await this.gaiaStore.createEvent(eventId, 311221, ticketPrice, [ticketId], {
-            from: deployer,
-        });
+        await this.gaiaStore.createEvent(
+            eventId,
+            311221,
+            ticketPrice,
+            [ticketId],
+            {
+                from: deployer,
+            }
+        );
 
         // check gaia has balance 0
         assert.equal(await web3.eth.getBalance(this.gaiaStore.address), 0);
@@ -179,17 +205,22 @@ contract("Gaia Test", function (accounts) {
             value: ticketPrice,
             gasPrice: 0,
         });
-        truffleAssert.eventEmitted(ticketSold, 'TicketSold', (ev) => {
-            return ev._ticketId == ticketId &&
-            ev._eventId == eventId &&
-            ev._customer == recipient &&
-            ev._price == ticketPrice;
+        truffleAssert.eventEmitted(ticketSold, "TicketSold", (ev) => {
+            return (
+                ev._ticketId == ticketId &&
+                ev._eventId == eventId &&
+                ev._customer == recipient &&
+                ev._price == ticketPrice
+            );
         });
 
         // check customer has nft balance
         assert.equal(await this.nfticket.balanceOf(recipient), 1);
 
         // check gaia has balance 2
-        assert.equal(await web3.eth.getBalance(this.gaiaStore.address), ticketPrice);
+        assert.equal(
+            await web3.eth.getBalance(this.gaiaStore.address),
+            ticketPrice
+        );
     });
 });

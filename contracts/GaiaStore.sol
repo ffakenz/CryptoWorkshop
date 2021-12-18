@@ -16,7 +16,7 @@ contract GaiaStore is IStore, Ownable, Pausable {
      * @dev contract state
      */
     StoreState store;
-    
+
     /**
      * @dev constructor
      */
@@ -68,7 +68,7 @@ contract GaiaStore is IStore, Ownable, Pausable {
             }
             store.eventTickets[_eventId].push(_ticketId);
         }
-        
+
         EventStatus _status = EventStatus.Created;
         store.events[_eventId] = Event({
             eventId: _eventId,
@@ -76,7 +76,7 @@ contract GaiaStore is IStore, Ownable, Pausable {
             ticketPrice: _ticketPrice,
             status: _status
         });
-        
+
         emit EventCreated({
             _eventId: _eventId,
             _startDate: _startDate,

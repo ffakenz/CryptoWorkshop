@@ -7,19 +7,18 @@ https://nodejs.org/es/download/
 2. Install Visual Code
 https://code.visualstudio.com/Download
 
-2.1 Install Solidity extension for Visual Code
+3. Install Solidity extension for Visual Code
 https://marketplace.visualstudio.com/items?itemName=JuanBlanco.solidity
 
-3. Install Truffle 
+4. Install Truffle 
 `npm install truffle -g`
 
-4. Install Ganache
+5. Install Ganache
 `npm install ganache-cli -g`
 
 ## How to setup
 
 #### Install npm packages
-Install all dependencies
 `npm install`
 
 ## How to run local test
@@ -32,6 +31,7 @@ Install all dependencies
 ## How to run local deployment
 1. Run local blockchain
 `ganache-cli`
+
 2. Run local deployment
 `truffle deploy --network development`
 
