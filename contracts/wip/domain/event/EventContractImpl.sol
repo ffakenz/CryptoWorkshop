@@ -2,10 +2,13 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "../interfaces/IEventContract.sol";
 import "../interfaces/INFTContract.sol";
 
 contract EventContractImpl is IEventContract, Ownable {
+    using SafeMath for uint256;
+
     enum EventStatus {
         Void,
         Created,
@@ -43,7 +46,7 @@ contract EventContractImpl is IEventContract, Ownable {
     }
 
     modifier onlyWhitelisted() {
-        require(_event.whitelist[msg.sender], "user not allowed");
+        require(_event.whitelist[_msgSender()], "user not allowed");
         _;
     }
 
@@ -70,5 +73,12 @@ contract EventContractImpl is IEventContract, Ownable {
     /**
      * @dev externals
      */
-    function buyTicket(uint256 _tokenId) external payable onlyOwner {}
+    function buyTicket(uint256 _tokenId) external payable onlyOwner {
+        uint256 _ticketPrice = _event.ticketPrice;
+        require(msg.value >= _ticketPrice, "not enough money");
+
+        uint256 amountPaid = msg.value.sub(_ticketPrice);
+        payable(_msgSender()).transfer(amountPaid);
+        _event.nftContract.createTicket(_tokenId, _msgSender());
+    }
 }
