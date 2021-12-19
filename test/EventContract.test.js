@@ -26,8 +26,10 @@ contract("EventContract Test", function (accounts) {
 
         assert.equal(await this.nfticket.balanceOf(recipient), 0);
 
-        await this.eventContract.emitTicket(ticketId, recipient, {
+        await this.eventContract.buyTicket(ticketId, {
             from: recipient,
+            value: ticketPrice,
+            gasPrice: 0,
         });
 
         assert.equal(await this.nfticket.balanceOf(recipient), 1);

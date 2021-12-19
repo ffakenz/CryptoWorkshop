@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "../interfaces/INFTContract.sol";
 
+// @TODO add permissions to createTicket using AccessControl
 contract NFTicketImpl is ERC721, INFTContract, Ownable {
     struct NFT {
         string _eventName;

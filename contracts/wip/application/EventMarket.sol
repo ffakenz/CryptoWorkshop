@@ -54,17 +54,4 @@ contract EventMarket is Logger, Ownable {
             _whitelist
         );
     }
-
-    /**
-     * @dev payables
-     */
-    function buyTicket(uint256 _tokenId, uint256 _eventId) external payable {
-        IEventContract eventContract = eventContracts[_eventId];
-        uint256 _ticketPrice = eventContract.getTicketPrice(_tokenId);
-        require(msg.value >= _ticketPrice, "not enough money");
-
-        uint256 amountPaid = msg.value.sub(_ticketPrice);
-        payable(_msgSender()).transfer(amountPaid);
-        eventContract.emitTicket(_tokenId, _msgSender());
-    }
 }

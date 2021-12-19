@@ -58,7 +58,7 @@ contract("EventMarket Test", function (accounts) {
             0
         );
 
-        await this.eventMarket.buyTicket(ticketId, eventId, {
+        await this.eventContract.methods.buyTicket(ticketId).send({
             from: recipient,
             value: ticketPrice,
             gasPrice: 0,

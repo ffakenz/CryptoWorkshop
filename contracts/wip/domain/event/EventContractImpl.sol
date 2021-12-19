@@ -8,6 +8,7 @@ import "../interfaces/IEventContract.sol";
 import "../interfaces/INFTContract.sol";
 import "../../infrastructure/Logger.sol";
 
+// @TODO add permissions to emitTicket using AccessControl
 contract EventContractImpl is Logger, IEventContract, Ownable {
     using SafeMath for uint256;
     using Strings for uint256;
@@ -27,8 +28,8 @@ contract EventContractImpl is Logger, IEventContract, Ownable {
         uint256 eventId;
         uint256 startDate;
         uint256 ticketPrice;
-        INFTContract nftContract;
         EventStatus status;
+        INFTContract nftContract;
         mapping(address => bool) whitelist;
     }
 
@@ -68,8 +69,8 @@ contract EventContractImpl is Logger, IEventContract, Ownable {
         _event.eventId = _eventId;
         _event.startDate = _startDate;
         _event.ticketPrice = _ticketPrice;
-        _event.nftContract = _nftContract;
         _event.status = EventStatus.Created;
+        _event.nftContract = _nftContract;
         for (uint256 i = 0; i < _whitelist.length; i += 1) {
             _event.whitelist[_whitelist[i]] = true;
         }
@@ -79,17 +80,12 @@ contract EventContractImpl is Logger, IEventContract, Ownable {
     /**
      * @dev payables
      */
-    function emitTicket(uint256 _tokenId, address customer)
-        external
-        onlyWhitelisted(customer)
-    {
-        _event.nftContract.createTicket(_tokenId, customer);
-    }
+    function buyTicket(uint256 _tokenId) external payable {
+        uint256 _ticketPrice = _event.ticketPrice;
+        require(msg.value >= _ticketPrice, "not enough money");
 
-    /**
-     * @dev views
-     */
-    function getTicketPrice(uint256 _tokenId) external view returns (uint256) {
-        return _event.ticketPrice;
+        uint256 amountPaid = msg.value.sub(_ticketPrice);
+        payable(_msgSender()).transfer(amountPaid);
+        _event.nftContract.createTicket(_tokenId, _msgSender());
     }
 }
