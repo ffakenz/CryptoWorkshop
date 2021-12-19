@@ -13,12 +13,16 @@ contract EventStoreFactoryImpl is IEventStoreAbstractFactory, Ownable {
     function createEventContract(
         uint256 _eventId,
         uint256 _startDate,
-        uint256 _ticketPrice
+        uint256 _ticketPrice,
+        INFTContract _nftContract,
+        address[] memory _whitelist
     ) external onlyOwner returns (IEventContract) {
         IEventContract eventContract = new EventContractImpl(
             _eventId,
             _startDate,
-            _ticketPrice
+            _ticketPrice,
+            _nftContract,
+            _whitelist
         );
         return eventContract;
     }

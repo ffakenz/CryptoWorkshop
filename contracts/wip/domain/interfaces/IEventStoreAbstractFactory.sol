@@ -8,7 +8,9 @@ interface IEventStoreAbstractFactory {
     function createEventContract(
         uint256 _eventId,
         uint256 _startDate,
-        uint256 _ticketPrice
+        uint256 _ticketPrice,
+        INFTContract _nftContract,
+        address[] memory _whitelist
     ) external returns (IEventContract);
 
     function createNFTContract(

@@ -22,13 +22,20 @@ contract EventMarket is Ownable {
         uint256 _startDate,
         uint256 _ticketPrice,
         string memory _eventName,
-        string memory _eventSymbol
+        string memory _eventSymbol,
+        address[] memory _whitelist
     ) external onlyOwner {
         nftContract = factory.createNFTContract(_eventName, _eventSymbol);
         eventContract = factory.createEventContract(
             _eventId,
             _startDate,
-            _ticketPrice
+            _ticketPrice,
+            nftContract,
+            _whitelist
         );
+    }
+
+    function buyTicket(uint256 _tokenId) external payable {
+        eventContract.buyTicket(_tokenId);
     }
 }
