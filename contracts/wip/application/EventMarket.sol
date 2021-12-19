@@ -8,6 +8,7 @@ import "../domain/interfaces/INFTContract.sol";
 import "../domain/interfaces/IEventStoreAbstractFactory.sol";
 import "../infrastructure/EventStoreFactoryImpl.sol";
 
+// @TODO contract needs money to deploy?
 contract EventMarket is Ownable {
     IEventContract eventContract;
     INFTContract nftContract;

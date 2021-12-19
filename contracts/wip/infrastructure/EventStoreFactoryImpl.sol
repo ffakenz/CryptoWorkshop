@@ -9,6 +9,7 @@ import "../domain/interfaces/IEventStoreAbstractFactory.sol";
 import "../domain/event/EventContractImpl.sol";
 import "../domain/nft/NFTicketImpl.sol";
 
+// @TODO contract needs money to deploy?
 contract EventStoreFactoryImpl is IEventStoreAbstractFactory, Ownable {
     function createEventContract(
         uint256 _eventId,
