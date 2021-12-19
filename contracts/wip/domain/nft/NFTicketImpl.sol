@@ -28,7 +28,7 @@ contract NFTicketImpl is ERC721, INFTContract, Ownable {
     /**
      * @dev externals
      */
-    function createTicket(uint256 _tokenId, address _to) external onlyOwner {
+    function createTicket(uint256 _tokenId, address _to) external {
         _mint(_to, _tokenId);
     }
 }

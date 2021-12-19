@@ -10,9 +10,9 @@ import "../infrastructure/EventStoreFactoryImpl.sol";
 
 // @TODO contract needs money to deploy?
 contract EventMarket is Ownable {
-    IEventContract eventContract;
-    INFTContract nftContract;
-    IEventStoreAbstractFactory factory;
+    IEventContract public eventContract;
+    INFTContract public nftContract;
+    IEventStoreAbstractFactory public factory;
 
     constructor() {
         factory = new EventStoreFactoryImpl();

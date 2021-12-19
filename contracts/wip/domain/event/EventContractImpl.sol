@@ -73,7 +73,7 @@ contract EventContractImpl is IEventContract, Ownable {
     /**
      * @dev externals
      */
-    function buyTicket(uint256 _tokenId) external payable onlyOwner {
+    function buyTicket(uint256 _tokenId) external payable {
         uint256 _ticketPrice = _event.ticketPrice;
         require(msg.value >= _ticketPrice, "not enough money");
 
