@@ -24,14 +24,12 @@ contract("EventContract Test", function (accounts) {
     it("sell ticket to whitelisted customer", async () => {
         const ticketId = 1;
 
-        assert.equal(await this.nfticket.balanceOf(deployer), 0);
+        assert.equal(await this.nfticket.balanceOf(recipient), 0);
 
-        await this.eventContract.buyTicket(ticketId, {
-            from: deployer,
-            value: ticketPrice,
-            gasPrice: 0,
+        await this.eventContract.emitTicket(ticketId, recipient, {
+            from: recipient,
         });
 
-        assert.equal(await this.nfticket.balanceOf(deployer), 1);
+        assert.equal(await this.nfticket.balanceOf(recipient), 1);
     });
 });

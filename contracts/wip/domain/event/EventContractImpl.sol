@@ -2,12 +2,15 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "../interfaces/IEventContract.sol";
 import "../interfaces/INFTContract.sol";
+import "../../infrastructure/Logger.sol";
 
-contract EventContractImpl is IEventContract, Ownable {
+contract EventContractImpl is Logger, IEventContract, Ownable {
     using SafeMath for uint256;
+    using Strings for uint256;
 
     enum EventStatus {
         Void,
@@ -45,14 +48,16 @@ contract EventContractImpl is IEventContract, Ownable {
         _;
     }
 
-    modifier onlyWhitelisted() {
-        require(_event.whitelist[_msgSender()], "user not allowed");
+    modifier onlyWhitelisted(address customer) {
+        require(_event.whitelist[customer], "user not allowed");
         _;
     }
 
     /**
      * @dev constructor
      */
+    event EventContractCreated(address owner, address addr);
+
     constructor(
         uint256 _eventId,
         uint256 _startDate,
@@ -68,17 +73,23 @@ contract EventContractImpl is IEventContract, Ownable {
         for (uint256 i = 0; i < _whitelist.length; i += 1) {
             _event.whitelist[_whitelist[i]] = true;
         }
+        emit EventContractCreated(msg.sender, address(this));
     }
 
     /**
-     * @dev externals
+     * @dev payables
      */
-    function buyTicket(uint256 _tokenId) external payable {
-        uint256 _ticketPrice = _event.ticketPrice;
-        require(msg.value >= _ticketPrice, "not enough money");
+    function emitTicket(uint256 _tokenId, address customer)
+        external
+        onlyWhitelisted(customer)
+    {
+        _event.nftContract.createTicket(_tokenId, customer);
+    }
 
-        uint256 amountPaid = msg.value.sub(_ticketPrice);
-        payable(_msgSender()).transfer(amountPaid);
-        _event.nftContract.createTicket(_tokenId, _msgSender());
+    /**
+     * @dev views
+     */
+    function getTicketPrice(uint256 _tokenId) external view returns (uint256) {
+        return _event.ticketPrice;
     }
 }

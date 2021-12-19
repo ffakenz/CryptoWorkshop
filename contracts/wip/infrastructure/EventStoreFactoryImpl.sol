@@ -11,6 +11,18 @@ import "../domain/nft/NFTicketImpl.sol";
 
 // @TODO contract needs money to deploy?
 contract EventStoreFactoryImpl is IEventStoreAbstractFactory, Ownable {
+    /**
+     * @dev constructor
+     */
+    event EventStoreFactoryCreated(address owner, address addr);
+
+    constructor() {
+        emit EventStoreFactoryCreated(msg.sender, address(this));
+    }
+
+    /**
+     * @dev externals
+     */
     function createEventContract(
         uint256 _eventId,
         uint256 _startDate,

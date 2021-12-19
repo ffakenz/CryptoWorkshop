@@ -18,7 +18,7 @@ contract("EventMarket Test", function (accounts) {
     it("sell ticket to whitelisted customer", async () => {
         const ticketId = 1;
         const eventId = 1;
-        const ticketPrice = 2;
+        const ticketPrice = 1;
 
         await this.eventMarket.createEvent(
             eventId,
@@ -30,17 +30,23 @@ contract("EventMarket Test", function (accounts) {
         );
 
         // obtain deployed contracts
-        const nftContractAddress = await this.eventMarket.nftContract({
-            from: deployer,
-        });
+        const nftContractAddress = await this.eventMarket.nftContracts(
+            eventId,
+            {
+                from: deployer,
+            }
+        );
         this.nftContract = new Contract(
             compiledNFTicket.abi,
             nftContractAddress
         );
 
-        const eventContractAddress = await this.eventMarket.eventContract({
-            from: deployer,
-        });
+        const eventContractAddress = await this.eventMarket.eventContracts(
+            eventId,
+            {
+                from: deployer,
+            }
+        );
         this.eventContract = new Contract(
             compiledEventContract.abi,
             eventContractAddress
@@ -48,19 +54,19 @@ contract("EventMarket Test", function (accounts) {
 
         // check customer HAS NO nft balance
         assert.equal(
-            await this.nftContract.methods.balanceOf(deployer).call(),
+            await this.nftContract.methods.balanceOf(recipient).call(),
             0
         );
 
-        await this.eventMarket.buyTicket(ticketId, {
-            from: deployer,
+        await this.eventMarket.buyTicket(ticketId, eventId, {
+            from: recipient,
             value: ticketPrice,
             gasPrice: 0,
         });
 
         // check customer HAS nft balance
         assert.equal(
-            await this.nftContract.methods.balanceOf(deployer).call(),
+            await this.nftContract.methods.balanceOf(recipient).call(),
             1
         );
     });

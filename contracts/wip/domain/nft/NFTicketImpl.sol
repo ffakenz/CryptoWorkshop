@@ -19,10 +19,13 @@ contract NFTicketImpl is ERC721, INFTContract, Ownable {
     /**
      * @dev constructor
      */
+    event NFTContractCreated(address owner, address addr);
+
     constructor(string memory _eventName, string memory _eventSymbol)
         ERC721(_eventName, _eventSymbol)
     {
         _nft = NFT({_eventName: _eventName, _eventSymbol: _eventSymbol});
+        emit NFTContractCreated(msg.sender, address(this));
     }
 
     /**
