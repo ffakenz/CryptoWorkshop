@@ -38,6 +38,7 @@ contract("Store Test", function (accounts) {
         // check customer NFT balance == 0
         assert.equal(await this.nft.balanceOf(client), 0);
 
+        // ----------------------------------------------------------------
         // customer buy NFT
         const tokenId = 1;
         const paymentId = 1;
@@ -53,6 +54,7 @@ contract("Store Test", function (accounts) {
         await this.paymentGateway.pay(paymentId, price, {from: customer});
         // customer claims NFT
         await this.store.claimNFT(tokenId, paymentId, {from: customer});
+        // ----------------------------------------------------------------
 
         // check client & customer USDC balance
         assert.equal(await this.usdc.balanceOf(client), 50);
