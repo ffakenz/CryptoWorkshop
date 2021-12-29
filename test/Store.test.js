@@ -35,32 +35,30 @@ contract("Store Test", function (accounts) {
         await this.usdc.faucet(customer, 100);
         assert.equal(await this.usdc.balanceOf(customer), 100);
 
-        // set NFT price
-        await this.store.setTokenPrice(
-            1, // tokenId
-            50, // price
-            {
-                from: client,
-            }
-        );
-
         // check customer NFT balance == 0
         assert.equal(await this.nft.balanceOf(client), 0);
 
         // customer buy NFT
-        await this.store.buyNFT(
-            1, // tokenId
-            1, // paymentId
-            {
-                from: customer,
-            }
-        );
+        const tokenId = 1;
+        const paymentId = 1;
+        const price = 50;
+        // setup token price
+        await this.store.setTokenPrice(tokenId, price, {
+            from: client,
+        });
+        // customer pays price
+        await this.usdc.approve(this.paymentGateway.address, price, {
+            from: customer,
+        });
+        await this.paymentGateway.pay(paymentId, price, {from: customer});
+        // customer claims NFT
+        await this.store.claimNFT(tokenId, paymentId, {from: customer});
 
         // check client & customer USDC balance
         assert.equal(await this.usdc.balanceOf(client), 50);
         assert.equal(await this.usdc.balanceOf(customer), 50);
 
         // check customer NFT balance == 1
-        assert.equal(await this.nft.balanceOf(client), 1);
+        assert.equal(await this.nft.balanceOf(customer), 1);
     });
 });

@@ -7,15 +7,17 @@ library PaymentGatewayStructs {
         uint256 date;
         uint256 amount;
         address customer;
+        bool status;
     }
 }
 
 interface IPaymentGateway {
     event PaymentCompleted(PaymentGatewayStructs.Payment payment);
 
-    function pay(
-        address customer,
-        uint256 paymentId,
-        uint256 amount
-    ) external returns (bool);
+    function pay(uint256 paymentId, uint256 amount) external returns (bool);
+
+    function findPayment(uint256 paymentId)
+        external
+        view
+        returns (PaymentGatewayStructs.Payment memory);
 }

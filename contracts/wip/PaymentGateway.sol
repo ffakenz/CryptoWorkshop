@@ -2,71 +2,62 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./IPaymentGateway.sol";
 
 contract PaymentGateway is Ownable, IPaymentGateway {
-    using Strings for uint256;
-
     // state
-    IERC20 usdc;
-    address payable recipient;
-    address store;
-    mapping(address => mapping(uint256 => PaymentGatewayStructs.Payment)) payments;
-    mapping(uint256 => bool) paymentsIds;
+    IERC20 _usdc;
+    address payable _recipient;
+    mapping(uint256 => PaymentGatewayStructs.Payment) _payments;
 
     // constructor
     function initialize(address usdc_, address payable recipient_)
         public
         onlyOwner
     {
-        usdc = IERC20(usdc_);
-        recipient = recipient_;
+        _usdc = IERC20(usdc_);
+        _recipient = recipient_;
+    }
+
+    // views
+    function findPayment(uint256 paymentId)
+        public
+        view
+        returns (PaymentGatewayStructs.Payment memory)
+    {
+        return _payments[paymentId];
     }
 
     // externals
-    function pay(
-        address customer,
-        uint256 paymentId,
-        uint256 amount
-    ) public returns (bool) {
-        require(paymentsIds[paymentId] == false, "payment exists");
+    function pay(uint256 paymentId_, uint256 amount_) public returns (bool) {
+        address customer = _msgSender();
         PaymentGatewayStructs.Payment memory payment = createPayment(
             customer,
-            paymentId,
-            amount
+            paymentId_,
+            amount_
         );
-        executePayment(payment);
-        paymentsIds[paymentId] = true;
+        _usdc.transferFrom(customer, _recipient, amount_);
         emit PaymentCompleted(payment);
         return true;
     }
 
     // internals
-    event Log(string msg);
-
-    function executePayment(PaymentGatewayStructs.Payment memory payment)
-        internal
-    {
-        emit Log(string(abi.encodePacked("[HERE]", payment.amount.toString())));
-        usdc.approve(address(this), payment.amount); // @TODO
-        usdc.transferFrom(payment.customer, recipient, payment.amount);
-    }
-
     function createPayment(
-        address customer,
-        uint256 paymentId,
-        uint256 amount
+        address customer_,
+        uint256 paymentId_,
+        uint256 amount_
     ) internal returns (PaymentGatewayStructs.Payment memory) {
+        require(_payments[paymentId_].status == false, "payment exists");
         PaymentGatewayStructs.Payment memory payment = PaymentGatewayStructs
             .Payment({
-                id: paymentId,
+                id: paymentId_,
                 date: block.timestamp,
-                amount: amount,
-                customer: customer
+                amount: amount_,
+                customer: customer_,
+                status: true
             });
-        payments[customer][paymentId] = payment;
+        _payments[paymentId_] = payment;
         return payment;
     }
 }

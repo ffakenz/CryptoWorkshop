@@ -8,13 +8,13 @@ import "./IPaymentGateway.sol";
 import "./INFT.sol";
 
 contract Store is Ownable {
-    IPaymentGateway paymentGateway;
-    INFT nft;
-    mapping(uint256 => uint256) tokenPriceList;
-    address client;
+    IPaymentGateway _paymentGateway;
+    INFT _nft;
+    mapping(uint256 => uint256) _tokenPriceList;
+    address _client;
 
     modifier onlyClient() {
-        require(client == _msgSender(), "caller is not the caller");
+        require(_client == _msgSender(), "caller is not the caller");
         _;
     }
 
@@ -24,31 +24,25 @@ contract Store is Ownable {
         address paymentGateway_,
         address client_
     ) public onlyOwner {
-        paymentGateway = IPaymentGateway(paymentGateway_);
-        nft = INFT(nft_);
-        client = client_;
+        _paymentGateway = IPaymentGateway(paymentGateway_);
+        _nft = INFT(nft_);
+        _client = client_;
     }
 
     function setTokenPrice(uint256 tokenId_, uint256 price_) public onlyClient {
-        tokenPriceList[tokenId_] = price_;
+        _tokenPriceList[tokenId_] = price_;
     }
 
-    function buyNFT(uint256 tokenId_, uint256 paymentId_)
+    function claimNFT(uint256 tokenId_, uint256 paymentId_)
         public
         returns (bool)
     {
-        uint256 tokenPrice = tokenPriceList[tokenId_];
         address customer = _msgSender();
-        bool paymentCompleted = paymentGateway.pay(
-            customer,
-            paymentId_,
-            tokenPrice
-        );
-        if (paymentCompleted) {
-            nft.create(tokenId_, customer);
-            return true;
-        } else {
-            return false;
-        }
+        uint256 tokenPrice = _tokenPriceList[tokenId_];
+        PaymentGatewayStructs.Payment memory payment = _paymentGateway
+            .findPayment(paymentId_);
+        require(payment.amount >= tokenPrice, "payment amount is not enough");
+        _nft.create(tokenId_, customer);
+        return true;
     }
 }
