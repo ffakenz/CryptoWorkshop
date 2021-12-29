@@ -8,8 +8,8 @@ import "./INFT.sol";
 contract NFT is ERC721, Ownable, INFT {
     address minter;
 
-    constructor(string memory _eventName, string memory _eventSymbol)
-        ERC721(_eventName, _eventSymbol)
+    constructor(string memory name_, string memory symbol_)
+        ERC721(name_, symbol_)
     {}
 
     modifier onlyMinter() {
@@ -17,11 +17,11 @@ contract NFT is ERC721, Ownable, INFT {
         _;
     }
 
-    function setMinter(address minter_) external onlyOwner {
+    function initialize(address minter_) external onlyOwner {
         minter = minter_;
     }
 
     function create(uint256 _tokenId, address _to) external onlyMinter {
-        _mint(_to, _tokenId);
+        _safeMint(_to, _tokenId);
     }
 }

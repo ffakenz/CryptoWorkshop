@@ -10,21 +10,42 @@ import "./INFT.sol";
 contract Store is Ownable {
     IPaymentGateway paymentGateway;
     INFT nft;
+    mapping(uint256 => uint256) tokenPriceList;
+    address client;
 
-    // constructor
-    function initialize(address nft_, address paymentGateway_)
-        external
-        onlyOwner
-    {
-        paymentGateway = IPaymentGateway(paymentGateway_);
-        nft = INFT(nft_);
+    modifier onlyClient() {
+        require(client == _msgSender(), "caller is not the caller");
+        _;
     }
 
-    function buyNFT(uint256 tokenId, uint256 amount) external returns (bool) {
+    // constructor
+    function initialize(
+        address nft_,
+        address paymentGateway_,
+        address client_
+    ) public onlyOwner {
+        paymentGateway = IPaymentGateway(paymentGateway_);
+        nft = INFT(nft_);
+        client = client_;
+    }
+
+    function setTokenPrice(uint256 tokenId_, uint256 price_) public onlyClient {
+        tokenPriceList[tokenId_] = price_;
+    }
+
+    function buyNFT(uint256 tokenId_, uint256 paymentId_)
+        public
+        returns (bool)
+    {
+        uint256 tokenPrice = tokenPriceList[tokenId_];
         address customer = _msgSender();
-        bool paymentCompleted = paymentGateway.pay(customer, amount);
+        bool paymentCompleted = paymentGateway.pay(
+            customer,
+            paymentId_,
+            tokenPrice
+        );
         if (paymentCompleted) {
-            nft.create(tokenId, customer);
+            nft.create(tokenId_, customer);
             return true;
         } else {
             return false;

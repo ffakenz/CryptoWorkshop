@@ -1,10 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract MockUSDC is ERC20 {
-    constructor(string memory name_, string memory symbol_)
-        ERC20(name_, symbol_)
-    {}
+contract MockUSDC is ERC20, Ownable {
+    constructor() ERC20("USDC", "USDC") {}
+
+    function faucet(address payable recipient_, uint256 amount_)
+        public
+        onlyOwner
+    {
+        _mint(recipient_, amount_);
+    }
 }
